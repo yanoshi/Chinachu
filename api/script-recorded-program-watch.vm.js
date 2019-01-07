@@ -36,6 +36,8 @@ function main(avinfo) {
 		util.log(JSON.stringify(request.headers, null, '  '));
 	}
 
+	var multipleVoice = program.flags && program.flags.indexOf('二') != -1;
+
 	switch (request.type) {
 		case 'xspf':
 			response.setHeader('content-disposition', 'attachment; filename="' + program.id + '.xspf"');
@@ -181,6 +183,14 @@ function main(avinfo) {
 			}
 
 			var args = [];
+
+			if (multipleVoice) {
+				if (config.selectMultipleVoice == 'main') {
+					args.push('-dual_mono_mode', 'main');
+				} else if (config.selectMultipleVoice == 'sub') {
+					args.push('-dual_mono_mode', 'sub');
+				}
+			}
 
 			if (!request.query.debug) args.push('-v', '0');
 
