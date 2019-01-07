@@ -4,6 +4,8 @@ Usushio では使わない
 (function() {
 
 	var channel = null;
+	var multipleVoice = null;
+	var now = new Date().getTime();
 
 	data.schedule.forEach(function(ch) {
 		if (ch.id === request.param.chid) {
@@ -12,6 +14,13 @@ Usushio では使わない
 	});
 
 	if (channel === null) return response.error(404);
+
+	channel.programs.forEach(function(program) {
+		if (now > program.start && now < program.end) {
+			util.log(program.fullTitle);
+			multipleVoice = program.flags && program.flags.indexOf('二') != -1;
+		}
+	});
 
 	if (!data.status.feature.streamer) return response.error(403);
 
@@ -64,6 +73,14 @@ Usushio では使わない
 			}
 
 			var args = [];
+
+			if (multipleVoice) {
+				if (config.selectMultipleVoice == 'main') {
+					args.push('-dual_mono_mode', 'main');
+				} else if (config.selectMultipleVoice == 'sub') {
+					args.push('-dual_mono_mode', 'sub');
+				}
+			}
 
 			if (!request.query.debug) args.push('-v', '0');
 
